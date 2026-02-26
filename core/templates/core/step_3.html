@@ -1,0 +1,167 @@
+{% extends 'core/base.html' %}
+{% load static %} {# Добавляем для использования {% static %} #}
+
+{% block content %}
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 85vh; background-color: #f4f7f6;"> {# Светло-серый фон страницы #}
+    <div class="container py-5">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-10">
+                <!-- Заголовок страницы -->
+                <h1 class="display-3 mb-5" style="font-family: 'Playfair Display', serif; font-weight: 700; color: #0A192F;">Предпочтения</h1>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Выбор типа питания -->
+                    <h3 class="mb-4" style="font-family: 'Playfair Display', serif; font-weight: 700; color: #0A192F;">1. Тип питания</h3>
+                    
+                    <div class="row g-4 mb-5 pref-btn-group justify-content-center">
+                        <div class="col-md-4 col-lg-3">
+                            <input type="radio" class="btn-check" name="diet" value="all" id="d1" checked>
+                            <label class="btn pref-btn-large" for="d1">
+                                Без выбора
+                            </label>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <input type="radio" class="btn-check" name="diet" value="vege" id="d2">
+                            <label class="btn pref-btn-large" for="d2">
+                                Вегетарианство
+                            </label>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <input type="radio" class="btn-check" name="diet" value="vegan" id="d3">
+                            <label class="btn pref-btn-large" for="d3">
+                                Веганство
+                            </label>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <input type="radio" class="btn-check" name="diet" value="pesca" id="d4">
+                            <label class="btn pref-btn-large" for="d4">
+                                Пескетарианство
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Аллергии -->
+                    <h3 class="mb-4" style="font-family: 'Playfair Display', serif; font-weight: 700; color: #0A192F;">2. Исключить продукты</h3>
+                
+                    <div class="row g-4 mb-5 pref-check-group justify-content-center">
+                        <div class="col-md-6 col-lg-3">
+                            <input type="checkbox" class="btn-check" name="allergies" value="лактоз" id="a1">
+                            <label class="btn pref-check-large" for="a1">
+                                Лактоза
+                            </label>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <input type="checkbox" class="btn-check" name="allergies" value="орех" id="a2">
+                            <label class="btn pref-check-large" for="a2">
+                                Орехи
+                            </label>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <input type="checkbox" class="btn-check" name="allergies" value="глютен" id="a3">
+                            <label class="btn pref-check-large" for="a3">
+                                Глютен
+                            </label>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <input type="checkbox" class="btn-check" name="allergies" value="морепродукт" id="a4">
+                            <label class="btn pref-check-large" for="a4">
+                                Морепродукты
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mx-auto mt-5" style="max-width: 500px;">
+                        <button type="submit" class="btn btn-gold w-100 py-4 fs-2 shadow-lg text-uppercase fw-bold" 
+                                style="border-radius: 50px; color: #0A192F;"> 
+                            Сформировать рацион
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .display-3 { font-size: 3.5rem; line-height: 1.2; }
+
+    /* Кнопки выбора */
+    .pref-btn-large {
+        padding: 18px 28px !important; 
+        font-size: 1.5rem !important; 
+        font-weight: 600;
+        border-radius: 12px !important; 
+        border: 1px solid #ddd !important; 
+        background-color: #ffffff !important; 
+        color: #333 !important; 
+        transition: all 0.3s ease;
+        display: flex; 
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .pref-btn-large:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        color: #D4AF37 !important; 
+        border-color: #D4AF37 !important; 
+    }
+
+    .btn-check:checked + .pref-btn-large {
+        background: linear-gradient(45deg, #d4af37, #f9e076); 
+        color: #0A192F !important; 
+        border-color: #D4AF37 !important; 
+        box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(1px);
+    }
+
+    /* Чекбоксы */
+    .pref-check-large {
+        padding: 15px 25px !important; 
+        font-size: 1.5rem !important; 
+        font-weight: 600;
+        border-radius: 12px !important; 
+        border: 1px solid #ddd !important; 
+        background-color: #ffffff !important; 
+        color: #333 !important; 
+        transition: all 0.3s ease;
+        display: flex; 
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+    .pref-check-large:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        border-color: #D4AF37 !important; 
+        color: #D4AF37 !important; 
+    }
+
+    .btn-check:checked + .pref-check-large {
+        background-color: #fff1e0 !important; 
+        color: #0A192F !important; 
+        border-color: #D4AF37 !important; 
+        box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+        transform: translateY(1px);
+    }
+
+    /* Сформировать рацион */
+    .btn-gold.w-100.py-4.fs-2 {
+        background: linear-gradient(45deg, #d4af37, #f9e076); 
+        font-size: 2rem !important; 
+        padding: 25px 40px !important; 
+        border-radius: 50px;
+        color: #0A192F !important; 
+        box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3); 
+    }
+
+    .btn-gold.w-100.py-4.fs-2:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.05); 
+    }
+
+    .btn-check { display: none; }
+</style>
+{% endblock %}

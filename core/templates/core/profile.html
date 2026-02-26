@@ -1,0 +1,293 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    :root {
+        --luxury-gold: #C5A059;
+        --luxury-beige: #F9F7F2;
+        --luxury-dark: #2C2C2C;
+    }
+
+    body {
+        background-color: var(--luxury-beige);
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .luxury-card {
+        background: white;
+        border: none;
+        border-radius: 0; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .profile-header-gold {
+        border-top: 4px solid var(--luxury-gold);
+        padding: 60px 0;
+        background: white;
+        margin-bottom: 50px;
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        color: var(--luxury-dark);
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+    }
+
+    .param-label {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.7rem;
+        color: #999;
+        margin-bottom: 5px;
+    }
+
+    .param-value {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--luxury-dark);
+    }
+
+    .btn-luxury-gold {
+        background-color: var(--luxury-gold);
+        color: white;
+        border: none;
+        border-radius: 0;
+        padding: 12px 30px;
+        letter-spacing: 2px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-luxury-gold:hover {
+        background-color: var(--luxury-dark);
+        color: white;
+    }
+
+    .btn-luxury-outline {
+        border: 1px solid var(--luxury-gold);
+        color: var(--luxury-gold);
+        border-radius: 0;
+        padding: 12px 30px;
+        letter-spacing: 2px;
+    }
+
+    .recipe-card {
+        border-radius: 0;
+        border: none;
+        overflow: hidden;
+        transition: 0.4s;
+    }
+
+    .recipe-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .macro-box {
+        background: #fcfcfc;
+        border: 1px solid #f0f0f0;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .macro-val {
+        display: block;
+        font-weight: 700;
+        color: var(--luxury-gold);
+    }
+
+    .macro-label {
+        font-size: 0.6rem;
+        color: #aaa;
+                text-transform: uppercase;
+    }
+</style>
+
+<div class="main-wrapper" style="padding-bottom: 100px;">
+    {% csrf_token %}
+    <!-- ВЕРХНИЙ БЛОК -->
+    <div class="profile-header-gold">
+        <div class="container text-center">
+            <div class="avatar-box mb-4">
+                <div style="width: 120px; height: 120px; border: 2px solid var(--luxury-gold); border-radius: 50%; padding: 5px; margin: 0 auto;">
+                    <div style="width: 100%; height: 100%; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-tie text-muted" style="font-size: 50px;"></i>
+                    </div>
+                </div>
+            </div>
+            <h1 class="section-title">{{ user.username|upper }}</h1>
+            <p class="text-muted mb-5" style="letter-spacing: 3px;">{{ user.email }}</p>
+
+            <div class="row justify-content-center mb-5">
+                <div class="col-6 col-md-2 border-end">
+                    <p class="param-label">Цель</p>
+                    <p class="param-value">
+                        {% if profile.goal == 'lose' %}ПОХУДЕНИЕ
+                        {% elif profile.goal == 'maintain' %}БАЛАНС
+                        {% elif profile.goal == 'gain' %}МАССА{% endif %}
+                    </p>
+                </div>
+                <div class="col-6 col-md-2 border-end">
+                    <p class="param-label">Вес</p>
+                    <p class="param-value">{{ profile.weight|default:"--" }} КГ</p>
+                </div>
+                <div class="col-6 col-md-2 border-end">
+                    <p class="param-label">Рост</p>
+                    <p class="param-value">{{ profile.height|default:"--" }} СМ</p>
+                </div>
+                <div class="col-6 col-md-2">
+                    <p class="param-label">Статус</p>
+                    <p class="param-value text-gold" style="color: var(--luxury-gold);">PREMIUM</p>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-3 mb-4"> 
+                <a href="{% url 'results' %}" class="btn btn-luxury-gold">ПОСМОТРЕТЬ МЕНЮ</a>
+                <a href="{% url 'individual_menu' %}" class="btn btn-luxury-outline">ПЕРЕСЧИТАТЬ</a>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'user_logout' %}" class="btn btn-link text-muted text-decoration-none" style="font-size: 0.8rem; letter-spacing: 1px;">
+                    Выйти из аккаунта
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- НИЖНИЙ БЛОК -->
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <h2 class="section-title mb-0" style="font-size: 2rem;">Ваша Коллекция</h2>
+                <p class="text-muted small">Выбранные рецепты для вашего рациона</p>
+            </div>
+            <div class="text-muted" style="letter-spacing: 2px; font-size: 0.8rem;">
+                ВСЕГО: {{ favorite_recipes|length }}
+            </div>
+        </div>
+
+        <div class="row g-5" id="fav-list-grid">
+            {% if favorite_recipes %}
+                {% for recipe in favorite_recipes %}
+                <div class="col-md-6 col-xl-4" id="recipe-{{ recipe.id }}">
+                    <div class="card luxury-card h-100 recipe-card" style="border-top: 3px solid var(--luxury-gold);">
+                        <div class="card-body p-4 d-flex flex-column">
+                            
+                            <div class="mb-2">
+                                <span style="letter-spacing: 2px; font-size: 0.7rem; color: var(--luxury-gold); font-weight: 600;">
+                                    {{ recipe.meal_type|upper }}
+                                </span>
+                            </div>
+
+                            <!-- Заголовок -->
+                            <h4 class="fw-bold mb-3" style="color: var(--luxury-dark); font-family: 'Playfair Display', serif; line-height: 1.2;">
+                                {{ recipe.title }}
+                            </h4>
+                            
+                            <!-- Ингредиенты -->
+                            <div class="mb-4 flex-grow-1">
+                                <p class="param-label" style="font-size: 0.6rem;">Ингредиенты</p>
+                                <div class="text-muted small" style="line-height: 1.6; font-style: italic;">
+                                    {{ recipe.description|truncatechars:150 }}
+                                </div>
+                            </div>
+
+                            <!-- КБЖУ сетка -->
+                            <div class="row g-2 mb-4">
+                                <div class="col-3">
+                                    <div class="macro-box">
+                                        <span class="macro-val" style="font-size: 0.9rem;">{{ recipe.calories }}</span>
+                                        <span class="macro-label">К</span>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="macro-box">
+                                        <span class="macro-val" style="font-size: 0.9rem;">{{ recipe.protein }}</span>
+                                        <span class="macro-label">Б</span>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="macro-box">
+                                        <span class="macro-val" style="font-size: 0.9rem;">{{ recipe.fat }}</span>
+                                        <span class="macro-label">Ж</span>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="macro-box">
+                                        <span class="macro-val" style="font-size: 0.9rem;">{{ recipe.carbs }}</span>
+                                        <span class="macro-label">У</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Кнопки управления -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: #f0f0f0 !important;">
+                                <button class="btn btn-link text-muted p-0 text-decoration-none shadow-none" 
+                                        onclick="copyIngreds('ing-{{ recipe.id }}')" 
+                                        style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    <i class="far fa-copy me-1"></i> КОПИРОВАТЬ
+                                </button>
+                                <button class="btn btn-link text-danger p-0 text-decoration-none btn-remove-fav shadow-none" 
+                                        data-id="{{ recipe.id }}" 
+                                        style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    <i class="fas fa-trash-alt me-1"></i> УДАЛИТЬ
+                                </button>
+                                <div id="ing-{{ recipe.id }}" class="d-none">{{ recipe.description }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted" style="letter-spacing: 2px;">ВАША КОЛЛЕКЦИЯ ПОКА ПУСТА</p>
+                    <a href="{% url 'individual_menu' %}" class="btn btn-luxury-gold mt-3">ПОДОБРАТЬ РАЦИОН</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copyIngreds(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Рецепт скопирован в буфер обмена");
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-remove-fav').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const recipeId = this.dataset.id;
+            const card = document.getElementById('recipe-' + recipeId);
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            if (confirm('Удалить этот шедевр из вашей коллекции?')) {
+                fetch("{% url 'toggle_favorite' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ 'recipe_id': recipeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' || data.action === 'removed') {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => { card.remove(); }, 400);
+                    }
+                })
+                .catch(err => console.error("Ошибка:", err));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5" style="font-family: 'Playfair Display';">Наши рационы</h1>
+    <div class="row g-4">
+        {% for diet in diets %}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 menu-type-card">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3">
+                        {% if diet.slug == 'all' %}🥩{% elif diet.slug == 'vege' %}🥦{% elif diet.slug == 'vegan' %}🌿{% else %}🐟{% endif %}
+                    </div>
+                    <h4 class="card-title">{{ diet.name }}</h4>
+                    <p class="card-text text-muted small" style="min-height: 60px;">{{ diet.desc }}</p>
+                    <hr>
+                    <p class="small fw-bold mb-2">Примеры блюд из базы:</p>
+                    <div class="d-flex flex-column gap-2 align-items-center">
+                        {% for sample in diet.samples %}
+                            <div class="p-2 w-100 border text-start shadow-sm" style="background-color: #0A192F; border-radius: 0;">
+                                <div class="fw-bold" style="color: #D4AF37; font-size: 0.9rem;">{{ sample.title }}</div>
+                                <div class="text-white-50" style="font-size: 0.75rem;">
+                                    {{ sample.calories }} ккал | Б:{{ sample.protein }} Ж:{{ sample.fat }} У:{{ sample.carbs }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <a href="{% url 'individual_menu' %}" class="btn btn-outline-gold w-100">Подобрать под себя</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .menu-type-card { 
+        transition: 0.4s; 
+        border: 1px solid #eee !important;
+        border-radius: 0; 
+    }
+    .menu-type-card:hover { 
+        transform: translateY(-10px); 
+        border-color: #D4AF37 !important; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+    }
+    .btn-outline-gold { 
+        color: #D4AF37; 
+        border-color: #D4AF37; 
+        border-radius: 0;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+    .btn-outline-gold:hover { 
+        background: #D4AF37; 
+        color: white; 
+    }
+    .badge {
+        font-weight: 400;
+        background-color: #0A192F !important;
+    }
+</style>
+{% endblock %}
