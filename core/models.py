@@ -110,7 +110,7 @@ class Profile(models.Model):
         if time_until_next_refresh.total_seconds() <= 0:
             return 0
 
-        # Округляем до целых дней, прибавляя 1, чтобы показать "через 3 дня" вместо "через 2.x дня"
+        # Округляем до целых дней, прибавляя 1, чтобы показать "через 3 дня"
         return time_until_next_refresh.days + 1
 
 # Автоматическое создание профиля при регистрации пользователя
@@ -154,7 +154,7 @@ def transfer_guest_data_to_profile(sender, request, user, **kwargs):
 
         profile.save()
 
-        # Очищаем сессию, чтобы данные не перенеслись повторно другому пользователю
+        # Очистка сессии, чтобы данные не перенеслись повторно другому пользователю
         keys_to_delete = ['goal', 'activity', 'age', 'weight', 'height', 'gender', 'diet_pref', 'allergies']
         for key in keys_to_delete:
             if key in session:
