@@ -1,0 +1,91 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 85vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 text-center">
+                
+                <h1 class="display-4 mb-5" style="font-family: 'Playfair Display', serif; font-weight: 700;">Ваши параметры</h1>
+
+                <!-- Вывод ошибок, если они есть -->
+                {% if errors %}
+                    {% for error in errors %}
+                        <div class="alert alert-danger shadow-sm">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" class="text-start">
+                    {% csrf_token %}
+                    
+                    <!-- Выбор пола кнопками -->
+                    <div class="mb-5">
+                        <label class="h3 mb-4 d-block text-center" style="font-family: 'Playfair Display';">Ваш пол:</label>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="gender" value="male" id="m" checked>
+                                <label class="btn btn-outline-dark w-100 py-3 fs-4 shadow-sm" for="m">♂ Мужской</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="gender" value="female" id="f">
+                                <label class="btn btn-outline-dark w-100 py-3 fs-4 shadow-sm" for="f">♀ Женский</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Поля ввода (Возраст, Вес, Рост) -->
+                                        <!-- Поля ввода с защитой -->
+                    <div class="bg-white p-4 shadow-sm mb-5" style="border-radius: 20px; border: 1px solid #eee;">
+                        <div class="mb-4">
+                            <label class="form-label fs-5 fw-bold text-muted">Возраст (лет)</label>
+                            <input type="number" name="age" min="12" max="110" 
+                                   class="form-control form-control-lg custom-input" 
+                                   placeholder="12 - 110" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fs-5 fw-bold text-muted">Вес (кг)</label>
+                            <!-- step="0.1" позволяет вводить дробные числа -->
+                            <input type="number" name="weight" step="0.1" min="30" max="300" 
+                                   class="form-control form-control-lg custom-input" 
+                                   placeholder="30 - 300" required>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label fs-5 fw-bold text-muted">Рост (см)</label>
+                            <input type="number" name="height" min="120" max="250" 
+                                   class="form-control form-control-lg custom-input" 
+                                   placeholder="120 - 250" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-gold w-100 py-3 fs-3 shadow-lg text-uppercase fw-bold" 
+                            style="background: linear-gradient(45deg, #d4af37, #f9e076); border: none; border-radius: 50px; color: #000;">
+                        Далее
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-input {
+        border: none;
+        border-bottom: 2px solid #eee;
+        border-radius: 0;
+        padding-left: 0;
+        font-size: 1.5rem;
+    }
+    .custom-input:focus {
+        box-shadow: none;
+        border-color: #d4af37;
+        background-color: transparent;
+    }
+    .btn-outline-dark {
+        border-radius: 15px;
+        transition: all 0.3s;
+    }
+    .btn-check:checked + .btn-outline-dark {
+        background-color: #1a1a1a;
+        color: white;
+    }
+</style>
+{% endblock %}

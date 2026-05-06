@@ -1,0 +1,86 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 90vh; background: #fdfdfd; padding-top: 50px; padding-bottom: 50px;">
+    <div class="col-12 col-md-10 col-lg-8"> 
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="border-top: 8px solid #D4AF37 !important;">
+            <div class="card-body p-5 p-md-5">
+                <h1 class="text-center mb-5 fw-bold display-4" style="color: #0A192F;">Регистрация</h1>
+                {% if form.errors %}
+                <div class="alert alert-danger p-3 mb-4 rounded-3">
+                    <ul class="mb-0">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><b>{{ field.label }}:</b> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- ЛЕВАЯ КОЛОНКА ФОРМЫ -->
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold fs-4">Имя пользователя (Логин)</label>
+                                <input type="text" name="username" class="form-control form-control-lg border-2 p-4 fs-5" placeholder="Напр: ivan_fit" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold fs-4">Электронная почта</label>
+                                <input type="email" name="email" class="form-control form-control-lg border-2 p-4 fs-5" placeholder="mail@example.com" required>
+                            </div>
+                        </div>
+
+                        <!-- ПРАВАЯ КОЛОНКА ФОРМЫ -->
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold fs-4">Придумайте пароль</label>
+                                <input type="password" name="password" class="form-control form-control-lg border-2 p-4 fs-5" placeholder="••••••••" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold fs-4">Повторите пароль</label>
+                                <input type="password" name="password_confirm" class="form-control form-control-lg border-2 p-4 fs-5" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- КРУПНАЯ КНОПКА -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-gold w-100 py-4 fs-3 fw-bold shadow text-uppercase" style="letter-spacing: 2px; border-radius: 15px;">
+                            СОЗДАТЬ ПЕРСОНАЛЬНЫЙ АККАУНТ
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-5">
+                    <p class="fs-5 text-muted">Уже зарегистрированы? 
+                        <a href="{% url 'user_login' %}" class="text-gold fw-bold text-decoration-none border-bottom border-2 border-gold">Войти в личный кабинет</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: #D4AF37 !important;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+    }
+    .btn-gold { 
+        background: #D4AF37; 
+        color: white; 
+        border: none; 
+        transition: all 0.3s ease; 
+    }
+    .btn-gold:hover { 
+        background: #b8962d; 
+        transform: translateY(-3px); 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container py-5 mt-5">
+    <!-- Заголовок секции -->
+    <div class="text-center mb-6 pb-3">
+        <h1 class="luxury-title">Наши рационы</h1>
+        <div class="luxury-divider"></div>
+        <p class="luxury-subtitle">Персонализированные решения для тех, кто ценит качество жизни</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        {% for diet in diets %}
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 luxury-card">
+                <div class="card-body d-flex flex-column p-4">
+                    
+                    <span class="luxury-category">
+                        {% if diet.slug == 'all' %}Classic{% elif diet.slug == 'vege' %}Plant-based{% elif diet.slug == 'vegan' %}Pure Vegan{% else %}Seafood{% endif %}
+                    </span>
+
+                    <h4 class="luxury-card-title">{{ diet.name }}</h4>
+                    <p class="luxury-card-text">{{ diet.desc }}</p>
+                    
+                    <div class="luxury-samples-section mt-auto">
+                        <p class="samples-label">Примеры блюд</p>
+                        <ul class="luxury-dish-list">
+                            {% for sample in diet.samples %}
+                            <li>
+                                <span class="dish-title">{{ sample.title }}</span>
+                                <span class="dish-meta">{{ sample.calories }} ккал | Б:{{ sample.protein }} Ж:{{ sample.fat }} У:{{ sample.carbs }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                    <a href="{% url 'individual_menu' %}" class="btn-luxury">Подобрать под себя</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
+
+    :root {
+        --gold-muted: #c5a059;
+        --dark-rich: #0A192F; 
+        --text-gray: #666;
+        --border-light: #e8e4e0;
+    }
+
+    /* Заголовок */
+    .luxury-title {        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        color: var(--dark-rich);
+        font-weight: 400;
+        margin-bottom: 15px;
+    }
+    .luxury-divider {
+        width: 60px;
+        height: 1px;
+        background: var(--gold-muted);
+        margin: 0 auto 20px;
+    }
+    .luxury-subtitle {
+        font-family: 'Inter', sans-serif;
+        font-style: italic;
+        color: var(--text-gray);
+        font-weight: 300;
+        letter-spacing: 0.5px;
+    }
+
+    /* Карточка */
+    .luxury-card {
+        border: 1px solid var(--border-light) !important;
+        border-radius: 0 !important; 
+        background-color: #fff;
+        transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        box-shadow: none !important;
+    }
+    .luxury-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--gold-muted) !important;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Категория сверху */
+    .luxury-category {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--gold-muted);
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .luxury-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        color: var(--dark-rich);
+        margin-bottom: 15px;
+    }
+
+    .luxury-card-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    /* Секция с блюдами */
+    .samples-label {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--dark-rich);
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+
+    .luxury-dish-list {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 0;
+    }
+    .luxury-dish-list li {
+        margin-bottom: 15px;
+        padding-left: 12px;
+        border-left: 1px solid var(--gold-muted); /* Тонкая золотая линия вместо бокса */
+    }
+    .dish-title {
+        display: block;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--dark-rich);
+        margin-bottom: 2px;
+    }
+    .dish-meta {
+        display: block;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        color: #999;
+    }
+
+    /* Кнопка */
+    .btn-luxury {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 14px;
+        border: 1px solid var(--dark-rich);
+        color: var(--dark-rich);
+        text-decoration: none !important;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+    }
+    .btn-luxury:hover {
+        background: var(--dark-rich);
+        color: #fff;
+    }
+</style>
+{% endblock %}

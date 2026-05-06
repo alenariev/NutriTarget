@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<!-- Обертка flex-grow-1 и d-flex для центрирования -->
+<div class="container-fluid d-flex align-items-center justify-content-center" style="min-height: 85vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8 text-center">
+                
+                <!-- Заголовок с увеличенным отступом -->
+                <h1 class="display-3 mb-5" style="font-family: 'Playfair Display', serif; font-weight: 700; color: #1a1a1a;">
+                    Выберите вашу цель
+                </h1>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    
+                    <!-- Кнопки выбора -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <input type="radio" class="btn-check" name="goal" id="lose" value="lose" checked>
+                            <label class="btn btn-outline-dark w-100 py-5 fs-4 d-flex flex-column align-items-center justify-content-center shadow-sm" for="lose">
+                                <span class="mb-2" style="font-size: 1.5rem;">🔥</span>
+                                Похудение
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="radio" class="btn-check" name="goal" id="maintain" value="maintain">
+                            <label class="btn btn-outline-dark w-100 py-5 fs-4 d-flex flex-column align-items-center justify-content-center shadow-sm" for="maintain">
+                                <span class="mb-2" style="font-size: 1.5rem;">⚖️</span>
+                                Поддержание
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="radio" class="btn-check" name="goal" id="gain" value="gain">
+                            <label class="btn btn-outline-dark w-100 py-5 fs-4 d-flex flex-column align-items-center justify-content-center shadow-sm" for="gain">
+                                <span class="mb-2" style="font-size: 1.5rem;">💪</span>
+                                Набор массы
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-5 text-start mx-auto" style="max-width: 600px;">
+                        <label class="form-label h3 mb-4 text-center d-block" style="font-family: 'Playfair Display';">Ваша активность:</label>
+                        <select name="activity" class="form-select form-select-lg p-3 fs-5 shadow-sm" style="border-radius: 12px; border: 2px solid #eee;">
+                            <option value="1.2">Минимальная (сидячая работа)</option>
+                            <option value="1.375">Слабая (1-2 тренировки в неделю)</option>
+                            <option value="1.55">Средняя (3-4 тренировки в неделю)</option>
+                            <option value="1.725">Высокая (ежедневные нагрузки)</option>
+                        </select>
+                    </div>
+                    <div class="mx-auto" style="max-width: 400px;">
+                        <button type="submit" class="btn btn-gold btn-xl w-100 py-3 fs-3 shadow-lg text-uppercase fw-bold transition-all" 
+                                style="background: linear-gradient(45deg, #d4af37, #f9e076); border: none; border-radius: 50px; color: #000;">
+                            Далее
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Эффект плавного появления при наведении на карточки */
+    .btn-outline-dark {
+        border-radius: 15px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+        background-color: #fff;
+    }
+    .btn-outline-dark:hover {
+        border-color: #d4af37;
+        background-color: #fdfaf0;
+        transform: translateY(-5px);
+    }
+    .btn-check:checked + .btn-outline-dark {
+        background-color: #1a1a1a;
+        border-color: #1a1a1a;
+        color: #fff;
+    }
+    /* Анимация кнопки */
+    .btn-gold:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3) !important;
+    }
+</style>
+{% endblock %}

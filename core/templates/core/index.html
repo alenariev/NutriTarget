@@ -1,0 +1,208 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* ГЛАВНЫЙ ТЕМНЫЙ БЛОК */
+    .hero-luxury-v2 {
+        background: #0A192F !important;
+        background-image: none !important;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        padding: 60px 20px;
+        overflow: hidden;
+    }
+
+    /* Декоративное сияние в центре */
+    .hero-luxury-v2::before {
+        content: '';
+        position: absolute;
+        width: 120%; 
+        height: 120%; 
+        background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08) 0%, rgba(10, 25, 47, 0) 60%);
+        pointer-events: none;
+        animation: subtleGlow 10s infinite alternate; /* Мягкое пульсирующее свечение */
+    }
+
+    @keyframes subtleGlow {
+        from { transform: scale(1); opacity: 0.8; }
+        to { transform: scale(1.05); opacity: 1; }
+    }
+
+    /* Контейнер для текста и кнопки */
+    .hero-content-v2 {
+        position: relative;
+        z-index: 1; /* Контент поверх свечения */
+        max-width: 950px; 
+    }
+
+    /* Тонкие золотые линии сверху и снизу заголовка */
+    .hero-content-v2 .gold-divider {
+        width: 80px; 
+        height: 1px;
+        background: #D4AF37;
+        margin: 0 auto 35px; 
+        opacity: 0.8;
+    }
+    .hero-content-v2 .gold-divider.bottom {
+        margin-top: 35px; /* Отступ снизу заголовка */
+        margin-bottom: 50px; /* Отступ перед кнопкой */
+    }
+
+    .hero-content-v2 h1 {
+        font-family: 'Playfair Display', serif !important;
+        font-size: 5.2rem !important;
+        font-weight: 700 !important;
+        color: #FFFFFF !important;
+        margin-bottom: 0px; 
+        letter-spacing: -2px;
+        line-height: 1.1;
+    }
+
+    .hero-content-v2 h1 span {
+        color: #D4AF37 !important;
+        font-style: italic;
+    }
+
+    .hero-content-v2 p {
+        font-family: 'Montserrat', sans-serif !important;
+                font-size: 1.15rem !important; 
+        color: rgba(255, 255, 255, 0.7) !important; 
+        text-transform: uppercase !important;
+        letter-spacing: 6px !important; 
+        margin-top: 15px;
+        font-weight: 300;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-action-gold-v2 {
+        background: #D4AF37 !important;
+        color: #0A192F !important;
+        padding: 20px 60px; 
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        border: none;
+        border-radius: 2px;
+    }
+
+    .btn-action-gold-v2:hover {
+        background: #F1C40F !important; 
+        transform: translateY(-5px); 
+        box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4); 
+    }
+
+    /* СВЕТЛЫЙ БЛОК С ПРЕИМУЩЕСТВАМИ */
+    .features-lux-white-block {
+        background: #FFFFFF !important; 
+        padding: 120px 0; 
+        color: #1A1A1A;
+    }
+
+    /* Карточки преимуществ */
+    .feature-card-lux-v2 {
+        text-align: center;
+        padding: 40px; 
+        background: #FFFFFF;
+        border: 1px solid rgba(0, 0, 0, 0.08); 
+        border-radius: 5px; 
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); 
+        transition: all 0.4s ease; /* Плавный переход для всех свойств */
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; 
+        align-items: center;
+    }
+
+    .feature-card-lux-v2:hover {
+        transform: translateY(-8px); 
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); /* Более выраженная тень при наведении */
+        border-color: rgba(212, 175, 55, 0.3); /* Тонкая золотая рамка при наведении */
+    }
+
+    .feature-card-lux-v2 h3 {
+        font-family: 'Playfair Display', serif;
+        color: #D4AF37; /* Золотые заголовки на белом */
+        font-size: 2rem; 
+        margin-bottom: 20px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .feature-card-lux-v2 p {
+        color: #444444; 
+        font-size: 1rem; 
+        line-height: 1.8;
+        font-weight: 400;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    /* Адаптивность для мобильных */
+    @media (max-width: 991.98px) {
+        .hero-luxury-v2 h1 { font-size: 3.5rem !important; }
+        .hero-luxury-v2 p { font-size: 0.9rem !important; letter-spacing: 4px !important; }
+        .btn-action-gold-v2 { padding: 15px 40px; font-size: 0.75rem; letter-spacing: 2px; }
+        .hero-content-v2 .gold-divider { margin-bottom: 25px; }
+        .hero-content-v2 .gold-divider.bottom { margin-top: 25px; margin-bottom: 40px; }
+        .features-lux-white-block { padding: 80px 0; }
+        .feature-card-lux-v2 { padding: 30px; margin-bottom: 20px; }
+        .feature-card-lux-v2 h3 { font-size: 1.6rem; }
+    }
+    @media (max-width: 767.98px) {
+        .hero-luxury-v2 h1 { font-size: 2.5rem !important; letter-spacing: -1px; }
+        .hero-luxury-v2 p { font-size: 0.8rem !important; letter-spacing: 2px !important; }
+        .btn-action-gold-v2 { padding: 12px 30px; font-size: 0.7rem; letter-spacing: 1.5px; }
+        .hero-content-v2 .gold-divider { margin-bottom: 20px; }
+        .hero-content-v2 .gold-divider.bottom { margin-top: 20px; margin-bottom: 30px; }
+    }
+</style>
+
+<!-- ТЕМНЫЙ БЛОК -->
+<section class="hero-luxury-v2">
+    <div class="hero-content-v2">
+        <div class="gold-divider"></div> <!-- Верхняя золотая линия -->
+        <h1>Достигайте целей <span>вкусно</span></h1>
+        <p>Индивидуальный расчет КБЖУ и подбор меню</p>
+        <div class="gold-divider bottom"></div> <!-- Нижняя золотая линия -->
+        <a href="{% url 'individual_menu' %}" class="btn-action-gold-v2">Начать расчет</a>
+    </div>
+</section>
+
+<!-- ПРЕИМУЩЕСТВА -->
+<section class="features-lux-white-block">
+    <div class="container">
+        <div class="row g-4 justify-content-center"> 
+            <div class="col-md-4">
+                <div class="feature-card-lux-v2">
+                    <h3>Точность</h3>
+                    <p>Научно обоснованный расчет по формуле Миффлина-Сан Жеора для вашего идеального баланса.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card-lux-v2">
+                    <h3>Разнообразие</h3>
+                    <p>Коллекция изысканных рецептов, превращающая диету в гастрономическое путешествие.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card-lux-v2">
+                    <h3>Удобство</h3>
+                    <p>Ваш персональный план питания, доступный в один клик и адаптированный под ваш ритм жизни.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

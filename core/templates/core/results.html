@@ -1,0 +1,389 @@
+{% extends 'core/base.html' %}
+{% load static %} {# Важно для использования {% static %} #}
+
+{% block title %}Ваш рацион | NutriTarget{% endblock %}
+
+{% block content %}
+{{ favorite_recipe_ids|json_script:"favorite-ids-data" }}
+{{ is_guest|json_script:"is-guest-data" }}
+{{ is_subscribed|json_script:"is-subscribed-data" }}
+{{ macros.p|json_script:"macro-p" }}
+{{ macros.f|json_script:"macro-f" }}
+{{ macros.c|json_script:"macro-c" }}
+
+<div class="container-fluid px-lg-5 py-5" style="max-width: 1600px;">
+    
+    <!-- ЗАГОЛОВОК -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold" style="font-family: 'Playfair Display', serif; color: #0A192F;">Ваш персональный рацион</h1>
+        <p class="lead text-muted">План питания на неделю, сбалансированный под ваши цели.</p>
+    </div>
+    
+    <!-- ИНФО-ПАНЕЛЬ КБЖУ -->
+    <div class="row bg-dark text-white p-5 shadow-lg mb-5 align-items-center rounded-4 mx-1 border-bottom border-gold" style="border-width: 4px !important;">
+                
+        <!-- ГРАФИК -->
+        <div class="col-md-3 text-center border-end border-secondary py-2">
+            <div style="height: 160px; width: 160px; margin: 0 auto;">
+                <canvas id="macrosChart"></canvas>
+            </div>
+            <h2 class="text-gold mt-3 fw-bold">{{ kcal }} <span style="font-size: 0.5em; color: #aaa; text-transform: uppercase;">ккал/день</span></h2>
+        </div>
+        
+        <!-- НУТРИЕНТЫ -->
+        <div class="col-md-6 px-lg-5 py-2">
+            <h4 class="text-gold mb-4 text-uppercase fw-bold" style="letter-spacing: 3px;">Суточная норма нутриентов:</h4>
+            <div class="d-flex justify-content-between mb-3 fs-5">
+                <span>Белки: <b class="text-white">{{ macros.p }}г</b></span>
+                <span>Жиры: <b class="text-white">{{ macros.f }}г</b></span>
+                <span>Углеводы: <b class="text-white">{{ macros.c }}г</b></span>
+            </div>
+            <div class="progress" style="height: 10px; background: #333; border-radius: 10px;">
+                <div class="progress-bar bg-gold" style="width: 100%"></div>
+            </div>
+                        
+            {% if profile.allergies %}
+                <div class="mt-4 p-2 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded">
+                    <span class="text-danger fw-bold">?? Исключены аллергены:</span> <span class="text-white-50">{{ profile.allergies }}</span>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- КНОПКА ОБНОВЛЕНИЯ -->
+        <div class="col-md-3 text-center border-start border-secondary py-2">
+            {% if is_guest %}
+                <p class="text-white-50 mb-3 fs-6">Для обновления меню нужна регистрация.</p>
+                <a href="{% url 'register' %}" class="btn btn-gold-lg w-100 fw-bold py-3 text-decoration-none">ЗАРЕГИСТРИРОВАТЬСЯ</a>
+            {% else %}
+                {% if is_subscribed %}
+                    <p class="text-white-50 mb-3 fs-6">Обновления: <strong class="text-success">БЕЗЛИМИТНО</strong></p>
+                    <a href="{% url 'refresh_meal' %}" class="btn btn-gold-lg w-100 fw-bold py-3 text-decoration-none">ОБНОВИТЬ ВСЁ МЕНЮ</a>
+                {% else %}
+                    {% if can_refresh %}
+                        <p class="text-white-50 mb-3 fs-6">Доступно обновлений: <strong class="text-warning">1 раз в неделю</strong></p>
+                        <a href="{% url 'refresh_meal' %}" class="btn btn-gold-lg w-100 fw-bold py-3 text-decoration-none">ОБНОВИТЬ ВСЁ МЕНЮ</a>
+                    {% else %}
+                        <p class="text-white-50 mb-3 fs-6">Следующее обновление через: <strong class="text-danger">{{ days_left }} дн.</strong></p>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-light w-100 fw-bold py-3 text-decoration-none">ПОДРОБНЕЕ О PREMIUM</a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- ВКЛАДКИ ДНЕЙ -->
+    <ul class="nav nav-pills mb-5 justify-content-center gap-3" id="pills-tab" role="tablist">
+        {% for day in weekly_plan %}
+        <li class="nav-item">
+            <button class="nav-link {% if forloop.first %}active{% endif %} day-btn-lg" 
+                 data-bs-toggle="pill" data-bs-target="#day-{{ forloop.counter }}">
+                {{ day.day_name }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+    
+    <!-- РЕЦЕПТЫ -->
+    <div class="tab-content mt-4">
+        {% for day in weekly_plan %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="day-{{ forloop.counter }}">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                {% for meal in day.meals %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow recipe-card-v2">
+                        <!-- КАРТИНКА С ПРОВЕРКОЙ ОШИБКИ -->
+                        <div class="img-container">
+                            <img src="{% if meal.image %}/static/img/{{ meal.image }}{% else %}/static/img/default_food.png{% endif %}" 
+                                 onerror="this.onerror=null;this.src='/static/img/default_food.png';"
+                                 class="card-img-top" alt="{{ meal.title }}">
+                            <div class="meal-weight-badge">{{ meal.weight }} г.</div>
+                        </div>
+                                                
+                        <div class="card-header-meal">{{ meal.type }}</div>
+                                                
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h4 class="card-title fw-bold text-dark mb-3" style="min-height: 3.5rem; font-size: 1.1rem;">{{ meal.title }}</h4>
+                                                        
+                            <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
+                                <span class="d-block fw-bold text-dark mb-1">Ингредиенты:</span>
+                                {{ meal.ingredients|truncatechars:120 }}
+                            </p>
+                            <!-- КБЖУ -->
+                            <div class="macro-footer mt-4">
+                                <div class="row text-center g-0">
+                                    <div class="col-3">
+                                        <div class="fw-bold">{{ meal.kcal }}</div>
+                                        <div class="macro-label">ККАЛ</div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="fw-bold">{{ meal.p }}г</div>
+                                        <div class="macro-label">Б</div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="fw-bold">{{ meal.f }}г</div>
+                                        <div class="macro-label">Ж</div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="fw-bold">{{ meal.c }}г</div>
+                                        <div class="macro-label">У</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- КНОПКИ -->
+                            <div class="d-flex gap-2 mt-4">
+                                <button class="btn btn-fav flex-grow-1" data-recipe-id="{{ meal.id }}">
+                                    <i class="far fa-heart me-1"></i> В избранное
+                                </button>
+                                
+                                <button class="btn btn-repl flex-grow-1" data-recipe-id="{{ meal.id }}" data-meal-type="{{ meal.type_slug }}">
+                                    <i class="fas fa-sync-alt me-1"></i> Замена
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО ДЛЯ КНОПКИ ЗАМЕНЫ -->
+<div class="modal fade" id="premiumModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-5 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-crown text-gold fa-4x"></i>
+                </div>
+                <h2 class="fw-bold mb-3">Нужен Premium</h2>
+                <p class="text-muted mb-4 fs-5">Функция мгновенной замены блюд доступна только пользователям с подпиской Premium.</p>
+                
+                {% if is_guest %}
+                    <a href="{% url 'user_login' %}" class="btn btn-gold-lg w-100 py-3 mb-2 fw-bold text-decoration-none">ВОЙТИ В АККАУНТ</a>
+                {% else %}
+                    <a href="{% url 'profile' %}" class="btn btn-gold-lg w-100 py-3 mb-2 fw-bold text-decoration-none">ПОДРОБНЕЕ О PREMIUM</a>
+                {% endif %}
+                <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Позже</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root { --gold: #D4AF37; --dark-navy: #0A192F; }
+    body { background-color: #f4f7f6; } 
+
+    /* Фикс сетки: чтобы карточки не прыгали и не сдвигались */
+    .recipe-card-v2 { 
+        border-radius: 20px; 
+        transition: 0.4s; 
+        overflow: hidden; 
+        background: white; 
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Карточки всегда одной высоты в ряду */
+        min-width: 100%;
+        border: none !important;
+    }
+    
+    .recipe-card-v2:hover { transform: translateY(-7px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+    /* Контейнер картинки: фиксированная высота, чтобы блоки не ехали */
+    .img-container { 
+        position: relative; 
+        height: 240px; 
+        min-height: 240px;
+        overflow: hidden; 
+        background: #eee; 
+    }
+    .img-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .meal-weight-badge {
+        position: absolute; top: 15px; right: 15px; background: rgba(10, 25, 47, 0.8);
+        color: white; padding: 5px 12px; border-radius: 50px; font-weight: 600; font-size: 0.8rem; z-index: 2;
+    }
+
+    .card-header-meal {
+        background: var(--dark-navy); color: var(--gold); text-align: center;
+        padding: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;
+    }
+
+    /* Заголовок: ограничиваем в 2 строки, чтобы высота была стабильной */
+    .card-title {
+        min-height: 3.2rem;
+        max-height: 3.2rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        font-size: 1.1rem;
+        line-height: 1.2;
+    }
+
+    .macro-footer { background: #f8f9fa; border-radius: 12px; padding: 10px 5px; margin-top: auto; }
+    .macro-label { font-size: 0.65rem; color: #888; }
+
+    .btn-gold-lg { background: var(--gold); color: white; border-radius: 12px; border: none; padding: 15px; text-decoration: none; display: block; font-weight: bold; text-align: center; }
+    .btn-gold-lg:hover { background: #b8962d; color: white; }
+
+    .btn-fav { border: 1px solid #ddd; color: #555 !important; border-radius: 10px; font-weight: 600; font-size: 0.8rem; background: white; padding: 0.5rem 0.5rem; transition: 0.3s; }
+    .btn-fav.active { background: #fff1f1 !important; color: #e74c3c !important; border-color: #e74c3c !important; }
+        .btn-repl { border: 1px solid var(--gold); color: var(--gold) !important; border-radius: 10px; font-weight: 600; font-size: 0.8rem; background: white; padding: 0.5rem 0.5rem; transition: 0.3s; }
+    .btn-repl:hover { background: var(--gold) !important; color: white !important; }
+
+    .day-btn-lg {
+        padding: 12px 25px; border-radius: 12px !important; background-color: #ffffff !important;
+        color: #0A192F !important; border: 2px solid #ddd !important; font-weight: 700; text-transform: uppercase;
+    }
+    .day-btn-lg.active { background-color: var(--gold) !important; border-color: var(--gold) !important; color: #fff !important; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Получаем данные из Django через json_script
+    const isGuest = JSON.parse(document.getElementById('is-guest-data').textContent);
+    const isSubscribed = JSON.parse(document.getElementById('is-subscribed-data').textContent);
+    let favoriteRecipeIds = JSON.parse(document.getElementById('favorite-ids-data').textContent || '[]');
+
+    // --- ФУНКЦИЯ ОБНОВЛЕНИЯ ВИДА КНОПКИ ИЗБРАННОГО ---
+    function updateFavBtn(btn, rid) {
+        if (favoriteRecipeIds.includes(parseInt(rid))) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-heart me-1"></i> В ИЗБРАННОМ';
+        } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="far fa-heart me-1"></i> В ИЗБРАННОЕ';
+        }
+    }
+
+    // Инициализация кнопок избранного при загрузке
+    document.querySelectorAll('.btn-fav').forEach(btn => {
+        updateFavBtn(btn, btn.dataset.recipeId);
+    });
+
+    // --- ЛОГИКА ИЗБРАННОГО (AJAX) ---
+    document.body.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-fav');
+        if (!btn) return;
+
+        if (isGuest) {
+            window.location.href = "{% url 'user_login' %}";
+            return;
+        }
+
+        const rid = btn.dataset.recipeId;
+        fetch('/api/favorite/toggle/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ 'recipe_id': rid })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                if (data.action === 'added') {
+                    favoriteRecipeIds.push(parseInt(rid));
+                } else {
+                    favoriteRecipeIds = favoriteRecipeIds.filter(id => id !== parseInt(rid));
+                }
+                updateFavBtn(btn, rid);
+            }
+        });
+    });
+
+    // --- ЛОГИКА ЗАМЕНЫ БЛЮДА (AJAX) ---
+    document.body.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-repl');
+        if (!btn) return;
+
+        if (!isSubscribed) {
+            const premiumModal = new bootstrap.Modal(document.getElementById('premiumModal'));
+            premiumModal.show();
+            return;
+        }
+
+        const rid = btn.dataset.recipeId;
+        const mealType = btn.dataset.mealType;
+        const card = btn.closest('.recipe-card-v2');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        fetch('/api/meal/replace/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ 'recipe_id': rid, 'meal_type': mealType })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sync-alt me-1"></i> ЗАМЕНА';
+
+            if (data.status === 'success') {
+                const newMeal = data.new_meal;
+
+                // Плавно скрываем и показываем контент, чтобы избежать резкого сдвига
+                card.style.opacity = '0.5';
+
+                // Обновляем данные в карточке
+                const img = card.querySelector('.card-img-top');
+                img.src = newMeal.image ? (newMeal.image.includes('http') ? newMeal.image : `/static/img/${newMeal.image}`) : "/static/img/default_food.png";
+                
+                card.querySelector('.meal-weight-badge').innerText = newMeal.weight + ' г.';
+                card.querySelector('.card-title').innerText = newMeal.title;
+                
+                // Ингредиенты (ограничиваем длину для стабильности сетки)
+                const ingredientsText = newMeal.ingredients.length > 120 ? newMeal.ingredients.substring(0, 120) + '...' : newMeal.ingredients;
+                card.querySelector('.card-text').innerHTML = `<span class="d-block fw-bold text-dark mb-1">Ингредиенты:</span> ${ingredientsText}`;
+                
+                // Макросы
+                const mDivs = card.querySelectorAll('.macro-footer .fw-bold');
+                mDivs[0].innerText = newMeal.kcal;
+                mDivs[1].innerText = newMeal.p + 'г';
+                mDivs[2].innerText = newMeal.f + 'г';
+                mDivs[3].innerText = newMeal.c + 'г';
+
+                // Обновляем ID в кнопках
+                btn.dataset.recipeId = newMeal.id;
+                const favBtn = card.querySelector('.btn-fav');
+                favBtn.dataset.recipeId = newMeal.id;
+                updateFavBtn(favBtn, newMeal.id);
+
+                card.style.opacity = '1';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sync-alt me-1"></i> ЗАМЕНА';
+            alert('Ошибка при замене блюда');
+        });
+    });
+
+    // --- КРУГОВАЯ ДИАГРАММА ---
+    const ctx = document.getElementById('macrosChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Белки', 'Жиры', 'Углеводы'],
+                datasets: [{
+                    data: [
+                        parseFloat(document.getElementById('macro-p').textContent),
+                        parseFloat(document.getElementById('macro-f').textContent),
+                        parseFloat(document.getElementById('macro-c').textContent)
+                    ],
+                    backgroundColor: ['#D4AF37', '#666', '#333'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '80%', plugins: { legend: { display: false } } }
+        });
+    }
+});
+</script>
+{% endblock %}
